@@ -1,0 +1,13 @@
+steps:
+- name: 'gcr.io/cloud-builders/gsutil'
+  args: ['cp', 'gs://my-bucket/my-table.md', '.']
+  id: 'Etapa 1: Copiar tabela do Google Cloud Storage'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['run', '-v', '/workspace:/data', 'my-docker-image', '/data/my-table.md', '/data/my-table.csv']
+  id: 'Etapa 2: Converter tabela de Markdown para CSV'
+- name: 'gcr.io/cloud-builders/gsutil'
+  args: ['cp', 'my-table.csv', 'gs://my-bucket/']
+  id: 'Etapa 3: Copiar CSV de volta para o Google Cloud Storage'
+- name: 'gcr.io/cloud-builders/bq'
+  args: ['load', 'my-dataset.my-table', 'gs://my-bucket/my-table.csv']
+  id: 'Etapa 4: Carregar CSV no BigQuery'
